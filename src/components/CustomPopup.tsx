@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 export default function CustomPopup({
   open,
@@ -20,12 +21,8 @@ export default function CustomPopup({
   return (
     <Dialog
       open={open}
-      keepMounted
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-slide-title"
-      aria-describedby="alert-dialog-slide-description"
-      fullWidth
     >
+      <CloseRoundedIcon sx={{position: "absolute", top: 20, right: 20, cursor: "pointer"}} onClick={handleClose} />
       <DialogContent>{children}</DialogContent>
       <DialogActions>{actions}</DialogActions>
     </Dialog>

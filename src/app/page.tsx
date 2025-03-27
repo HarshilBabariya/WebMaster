@@ -2,6 +2,6 @@
 import * as React from "react";
 import { Box } from "@mui/material";
 
-export default function Home() {
-  return <Box>Home</Box>;
+export default function Dashboard() {
+  return <Box>Dashboard</Box>;
 }

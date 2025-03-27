@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -15,13 +15,12 @@ import {
   Stack,
   Typography,
   FormControl,
-  FormLabel,
   TextField,
-  Link,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import CustomPopup from "./CustomPopup";
+import Image from "next/image";
 
 enum Popup {
   SignIn = "sign-in",
@@ -43,29 +42,30 @@ const StyledToolbar = styled(Toolbar)(() => ({
 }));
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  minHeight: '100%',
+  width: "350px",
+  minHeight: "100%",
   padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up("sm")]: {
     padding: theme.spacing(4),
   },
-  '&::before': {
+  "&::before": {
     content: '""',
-    display: 'block',
-    position: 'absolute',
+    display: "block",
+    position: "absolute",
     zIndex: -1,
     inset: 0,
     backgroundImage:
-      'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
+      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
+    backgroundRepeat: "no-repeat",
+    ...theme.applyStyles("dark", {
       backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
     }),
   },
 }));
 
 const headerButtons = [
-  { label: "Dashboard", route: "/dashboard" },
+  { label: "Dashboard", route: "/" },
   { label: "Products", route: "/products" },
   { label: "Orders", route: "/orders" },
   { label: "Branding", route: "/branding" },
@@ -75,55 +75,34 @@ const headerButtons = [
 
 export default function AppAppBar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = React.useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = React.useState<Popup | null>(null);
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+  const [users, setUsers] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data));
+  }, []);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+      email: data.get("email"),
+      password: data.get("password"),
     });
-  };
-
-  const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
-
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
+    if (isPopupOpen === Popup.SignIn) {
+      // handle sign in
     } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
+      // handle sign up
     }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    return isValid;
   };
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
+  console.log("sss", users)
 
   return (
     <AppBar
@@ -141,81 +120,108 @@ export default function AppAppBar() {
         handleClose={() => setIsPopupOpen(null)}
         actions
       >
-        <SignInContainer direction="column" justifyContent="space-between">
+        <SignInContainer>
+          <Image
+            src={"/assets/webmaster-logo.png"}
+            alt="WebMaster"
+            width={170}
+            height={230}
+            style={{ borderRadius: "8px", alignSelf: "center" }}
+          />
           <Typography
             component="h1"
             variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+            sx={{
+              width: "100%",
+              fontSize: "clamp(2rem, 10vw, 2.15rem)",
+              fontWeight: 600,
+              mb: 2,
+              textAlign: "center",
+            }}
           >
-            Sign in
+            {isPopupOpen === Popup.SignIn ? "Hello there!" : "Welcome!"}
           </Typography>
           <Box
             component="form"
             onSubmit={handleSubmit}
             noValidate
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
               gap: 2,
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
                 id="email"
                 type="email"
                 name="email"
-                placeholder="your@email.com"
+                placeholder="Email"
                 autoComplete="email"
                 autoFocus
                 required
                 fullWidth
-                variant="outlined"
-                color={emailError ? 'error' : 'primary'}
+                variant="standard"
+                sx={{ mb: 1 }}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
                 name="password"
-                placeholder="••••••"
+                placeholder="Password"
                 type="password"
                 id="password"
                 autoComplete="current-password"
                 autoFocus
                 required
                 fullWidth
-                variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
+                variant="standard"
+                sx={{ mb: 1 }}
               />
             </FormControl>
             <Button
               type="submit"
-              fullWidth
               variant="contained"
-              onClick={validateInputs}
+              sx={{
+                background: "#000000",
+                color: "#FFF",
+                fontWeight: 500,
+              }}
+              fullWidth
             >
-              Sign in
+              {isPopupOpen === Popup.SignIn ? "Login" : "Register"}
             </Button>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-            <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
-              <Link
-                href="/material-ui/getting-started/templates/sign-in/"
-                variant="body2"
-                sx={{ alignSelf: 'center' }}
-              >
-                Sign up
-              </Link>
+          <Box>
+            <Typography
+              sx={{
+                mt: 3,
+                fontSize: "18px",
+                fontWeight: 600,
+              }}
+            >
+              {isPopupOpen === Popup.SignIn
+                ? "New to Webmaster?"
+                : "Already have account?"}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "16px",
+                fontWeight: 600,
+                color: "red",
+                cursor: "pointer",
+              }}
+              onClick={() =>
+                setIsPopupOpen(
+                  isPopupOpen === Popup.SignIn ? Popup.SignUp : Popup.SignIn
+                )
+              }
+            >
+              {isPopupOpen === Popup.SignIn ? "JOIN NOW" : "LOG IN"}
             </Typography>
           </Box>
-      </SignInContainer>
+        </SignInContainer>
       </CustomPopup>
       <Container maxWidth="lg">
         <StyledToolbar variant="dense" disableGutters>
@@ -230,7 +236,7 @@ export default function AppAppBar() {
                     variant="text"
                     sx={{
                       textTransform: "capitalize",
-                      color: "#000000",
+                      color: pathname === button.route ? "red" : "#000000",
                       fontWeight: 500,
                     }}
                     onClick={() => router.push(button.route)}
