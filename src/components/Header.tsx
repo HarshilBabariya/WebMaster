@@ -44,7 +44,6 @@ const StyledToolbar = styled(Toolbar)(() => ({
 const SignInContainer = styled(Stack)(({ theme }) => ({
   width: "350px",
   minHeight: "100%",
-  padding: theme.spacing(2),
   [theme.breakpoints.up("sm")]: {
     padding: theme.spacing(4),
   },
@@ -102,7 +101,7 @@ export default function AppAppBar() {
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
-  console.log("sss", users)
+  console.log("sss", users);
 
   return (
     <AppBar
@@ -111,8 +110,8 @@ export default function AppAppBar() {
       sx={{
         boxShadow: 0,
         bgcolor: "transparent",
-        backgroundImage: "none",
-        mt: "calc(var(--template-frame-height, 0px) + 28px)",
+        p: "1rem 0",
+        backdropFilter: "blur(10px)",
       }}
     >
       <CustomPopup
@@ -122,10 +121,10 @@ export default function AppAppBar() {
       >
         <SignInContainer>
           <Image
-            src={"/assets/webmaster-logo.png"}
+            src={"/assets/webmaster-gif.gif"}
             alt="WebMaster"
-            width={170}
-            height={230}
+            width={100}
+            height={100}
             style={{ borderRadius: "8px", alignSelf: "center" }}
           />
           <Typography
@@ -152,6 +151,22 @@ export default function AppAppBar() {
               gap: 2,
             }}
           >
+            {isPopupOpen === Popup.SignUp && (
+              <FormControl>
+                <TextField
+                  id="name"
+                  type="name"
+                  name="name"
+                  placeholder="Name"
+                  autoComplete="name"
+                  autoFocus
+                  required
+                  fullWidth
+                  variant="standard"
+                  sx={{ mb: 1 }}
+                />
+              </FormControl>
+            )}
             <FormControl>
               <TextField
                 id="email"
