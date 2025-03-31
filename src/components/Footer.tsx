@@ -17,9 +17,9 @@ export const Footer = () => {
     <Box
       sx={{
         width: "100%",
-        backgroundColor: "#F1F5F9",
+        backgroundColor: "#000000",
         padding: "2rem 0",
-        bottom: 0
+        bottom: 0,
       }}
     >
       <Container maxWidth="lg">
@@ -28,6 +28,7 @@ export const Footer = () => {
             <Image
               src={"/assets/webmaster-brand.png"}
               alt="WebMaster"
+              style={{ filter: "invert(1)" }}
               width={180}
               height={50}
             />
@@ -39,7 +40,7 @@ export const Footer = () => {
               padding: "20px 0px",
               display: "flex",
               gap: 6,
-              color: "black",
+              color: "white",
             }}
           >
             {footerLinks.map((footerItem, index) => (
@@ -52,34 +53,34 @@ export const Footer = () => {
             <IconButton
               href="https://facebook.com"
               target="_blank"
-              sx={{ color: "black" }}
+              sx={{ color: "white" }}
             >
               <Facebook />
             </IconButton>
             <IconButton
               href="https://twitter.com"
               target="_blank"
-              sx={{ color: "black" }}
+              sx={{ color: "white" }}
             >
               <Twitter />
             </IconButton>
             <IconButton
               href="https://instagram.com"
               target="_blank"
-              sx={{ color: "black" }}
+              sx={{ color: "white" }}
             >
               <Instagram />
             </IconButton>
             <IconButton
               href="https://linkedin.com"
               target="_blank"
-              sx={{ color: "black" }}
+              sx={{ color: "white" }}
             >
               <LinkedIn />
             </IconButton>
           </Grid>
           <Grid item xs={12} sx={{ paddingTop: "10px" }}>
-            <Typography variant="body2" sx={{ color: "black" }}>
+            <Typography variant="body2" sx={{ color: "#AAAAAA" }}>
               &copy; {new Date().getFullYear()} WebMaster. All rights reserved.
             </Typography>
           </Grid>
