@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "@/components/Footer";
+import { Container } from "@mui/material";
 
 export const metadata = {
   title: "WebMaster",
@@ -18,9 +19,17 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Header />
-        <div style={{ margin: "110px 40px", minHeight: "31vh" }}>
+        <Container
+          maxWidth="xl"
+          sx={{
+            py: 6,
+            borderRadius: 2,
+            margin: "80px 50px",
+            width: "auto !important",
+          }}
+        >
           {children}
-        </div>
+        </Container>
         <Footer />
       </body>
     </html>

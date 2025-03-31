@@ -16,29 +16,32 @@ import {
   Typography,
   FormControl,
   TextField,
+  Alert,
+  Menu,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import CustomPopup from "./CustomPopup";
 import Image from "next/image";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 enum Popup {
   SignIn = "sign-in",
   SignUp = "sign-up",
 }
 
+interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  profile_url: string;
+  phone: string;
+}
+
 const StyledToolbar = styled(Toolbar)(() => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  flexShrink: 0,
-  borderRadius: "8px",
-  backdropFilter: "blur(24px)",
-  border: "1px solid",
-  borderColor: "white",
-  backgroundColor: "#F1F5F9",
-  boxShadow: "1",
-  padding: "8px 12px",
+  padding: "20px 16px",
 }));
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
@@ -47,52 +50,76 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.up("sm")]: {
     padding: theme.spacing(4),
   },
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
 }));
 
 const headerButtons = [
-  { label: "Dashboard", route: "/" },
+  { label: "Dashboard", route: "/dashboard" },
   { label: "Products", route: "/products" },
   { label: "Orders", route: "/orders" },
   { label: "Branding", route: "/branding" },
-  { label: "FAQs", route: "/faqs" },
-  { label: "Contact", route: "/contact-us" },
 ];
 
-export default function AppAppBar() {
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("* Email is required"),
+  password: Yup.string()
+    .min(6, "* Password must be at least 6 characters")
+    .required("* Password is required"),
+  name: Yup.string().when("isSignUp", {
+    is: Popup.SignUp,
+    then: (schema) => schema.required("* Name is required"),
+  }),
+});
+
+const Header = () => {
   const router = useRouter();
-  const pathname = usePathname();
   const [open, setOpen] = React.useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = React.useState<Popup | null>(null);
-  const [users, setUsers] = React.useState([]);
+  const [error, setError] = React.useState("");
+  const userDetails = JSON.parse(localStorage.getItem("userData") || "{}");
 
-  React.useEffect(() => {
-    fetch("/api/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data));
-  }, []);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+  const handleSubmit = (values: {
+    email: string;
+    name: string;
+    password: string;
+  }) => {
     if (isPopupOpen === Popup.SignIn) {
-      // handle sign in
+      fetch("/api/users", {
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const response: {
+            error?: string;
+            user?: IUser;
+            message?: string;
+          } = data;
+          if (response.error) {
+            setError(response.error);
+            return;
+          }
+          if (response.message && response.user) {
+            localStorage.setItem(
+              "userData",
+              JSON.stringify({
+                id: response.user.id,
+                name: response.user.name,
+                email: response.user.email,
+                profile_url: response.user.profile_url,
+                role: response.user.role,
+                phone: response.user.phone,
+              })
+            );
+            setIsPopupOpen(null);
+          }
+        })
+        .catch((_error) => {
+          setError("Something went wrong");
+        });
     } else {
       // handle sign up
     }
@@ -101,19 +128,9 @@ export default function AppAppBar() {
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
-  console.log("sss", users);
 
   return (
-    <AppBar
-      position="fixed"
-      enableColorOnDark
-      sx={{
-        boxShadow: 0,
-        bgcolor: "transparent",
-        p: "1rem 0",
-        backdropFilter: "blur(10px)",
-      }}
-    >
+    <>
       <CustomPopup
         open={isPopupOpen !== null}
         handleClose={() => setIsPopupOpen(null)}
@@ -140,74 +157,73 @@ export default function AppAppBar() {
           >
             {isPopupOpen === Popup.SignIn ? "Hello there!" : "Welcome!"}
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              width: "100%",
-              gap: 2,
+          <Formik
+            initialValues={{
+              email: "",
+              password: "",
+              name: "",
+              isSignUp: isPopupOpen
             }}
+            validationSchema={validationSchema}
+            onSubmit={(values) => handleSubmit(values)}
           >
-            {isPopupOpen === Popup.SignUp && (
-              <FormControl>
-                <TextField
-                  id="name"
-                  type="name"
-                  name="name"
-                  placeholder="Name"
-                  autoComplete="name"
-                  autoFocus
-                  required
+            {({ errors, touched }) => (
+              <Form
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 15,
+                  width: "100%",
+                }}
+              >
+                {isPopupOpen === Popup.SignUp && (
+                  <FormControl sx={{ width: "100%" }}>
+                    <Field
+                      as={TextField}
+                      variant="standard"
+                      name="name"
+                      placeholder="Name"
+                      error={touched.name && !!errors.name}
+                      helperText={touched.name && errors.name}
+                      fullWidth
+                    />
+                  </FormControl>
+                )}
+                <FormControl sx={{ width: "100%" }}>
+                  <Field
+                    as={TextField}
+                    variant="standard"
+                    name="email"
+                    placeholder="Email"
+                    error={touched.email && !!errors.email}
+                    helperText={touched.email && errors.email}
+                    fullWidth
+                  />
+                </FormControl>
+                <FormControl sx={{ width: "100%" }}>
+                  <Field
+                    as={TextField}
+                    variant="standard"
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    error={touched.password && !!errors.password}
+                    helperText={touched.password && errors.password}
+                    fullWidth
+                  />
+                </FormControl>
+                <Button
+                  type="submit"
+                  variant="contained"
                   fullWidth
-                  variant="standard"
-                  sx={{ mb: 1 }}
-                />
-              </FormControl>
+                  sx={{ background: "#000", color: "#FFF", fontWeight: 500 }}
+                >
+                  {isPopupOpen === Popup.SignIn ? "Login" : "Register"}
+                </Button>
+                {error.length > 0 && <Alert severity="error">{error}</Alert>}
+              </Form>
             )}
-            <FormControl>
-              <TextField
-                id="email"
-                type="email"
-                name="email"
-                placeholder="Email"
-                autoComplete="email"
-                autoFocus
-                required
-                fullWidth
-                variant="standard"
-                sx={{ mb: 1 }}
-              />
-            </FormControl>
-            <FormControl>
-              <TextField
-                name="password"
-                placeholder="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                autoFocus
-                required
-                fullWidth
-                variant="standard"
-                sx={{ mb: 1 }}
-              />
-            </FormControl>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                background: "#000000",
-                color: "#FFF",
-                fontWeight: 500,
-              }}
-              fullWidth
-            >
-              {isPopupOpen === Popup.SignIn ? "Login" : "Register"}
-            </Button>
-          </Box>
+          </Formik>
           <Box>
             <Typography
               sx={{
@@ -238,11 +254,26 @@ export default function AppAppBar() {
           </Box>
         </SignInContainer>
       </CustomPopup>
-      <Container maxWidth="lg">
+      <AppBar
+        position="fixed"
+        enableColorOnDark
+        sx={{
+          boxShadow: 0,
+          bgcolor: "black",
+        }}
+      >
         <StyledToolbar variant="dense" disableGutters>
           <Box
             sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
           >
+            <Image
+              src="/assets/webmaster-logo.png"
+              alt="WebMaster"
+              style={{ filter: "invert(1)", cursor: "pointer" }}
+              width={80}
+              height={50}
+              onClick={() => router.push("/")}
+            />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               {headerButtons.map((button) => {
                 return (
@@ -251,8 +282,11 @@ export default function AppAppBar() {
                     variant="text"
                     sx={{
                       textTransform: "capitalize",
-                      color: pathname === button.route ? "red" : "#000000",
+                      color: "#ffffff",
                       fontWeight: 500,
+                      "&:hover": {
+                        color: "#AAAAAA",
+                      },
                     }}
                     onClick={() => router.push(button.route)}
                   >
@@ -262,40 +296,79 @@ export default function AppAppBar() {
               })}
             </Box>
           </Box>
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <Button
-              variant="text"
+          {Object.keys(userDetails).length > 0 ? (
+            <Box
               sx={{
-                textTransform: "capitalize",
-                color: "#000000",
-                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                cursor: "pointer",
+                padding: "0 0.5rem",
               }}
-              onClick={() => setIsPopupOpen(Popup.SignIn)}
+              onClick={() => router.push("/profile")}
             >
-              Sign in
-            </Button>
-            <Button
-              variant="contained"
+              <img
+                src={userDetails.profile_url}
+                alt={userDetails.name}
+                style={{
+                  width: 35,
+                  height: "auto",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+              <Box>
+                <Typography sx={{ color: "white", fontSize: "14px" }}>
+                  {userDetails.name}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: "10px", fontWeight: 600, color: "red" }}
+                >
+                  {userDetails.role}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box
               sx={{
-                background: "#000000",
-                textTransform: "capitalize",
-                color: "#FFF",
-                fontWeight: 500,
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
               }}
-              onClick={() => setIsPopupOpen(Popup.SignUp)}
             >
-              Sign up
-            </Button>
-          </Box>
+              <Button
+                variant="text"
+                sx={{
+                  textTransform: "initial",
+                  color: "#ffffff",
+                  fontWeight: 500,
+                  padding: "12px 20px",
+                  "&:hover": {
+                    color: "#AAAAAA",
+                  },
+                }}
+                onClick={() => setIsPopupOpen(Popup.SignUp)}
+              >
+                Sign up
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#ffffff",
+                  textTransform: "initial",
+                  color: "#000000",
+                  fontWeight: 500,
+                  borderRadius: "30px",
+                  padding: "12px 20px",
+                }}
+                onClick={() => setIsPopupOpen(Popup.SignIn)}
+              >
+                Log in
+              </Button>
+            </Box>
+          )}
           <Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
-              <MenuIcon />
+              <MenuIcon sx={{ color: "#FFFFFF" }} />
             </IconButton>
             <Drawer
               anchor="top"
@@ -336,12 +409,12 @@ export default function AppAppBar() {
                 <Divider sx={{ my: 3 }} />
                 <MenuItem>
                   <Button
-                    variant="contained"
+                    variant="text"
                     sx={{
-                      background: "#000000",
-                      textTransform: "capitalize",
-                      color: "#FFF",
+                      textTransform: "initial",
+                      color: "#000000",
                       fontWeight: 500,
+                      padding: "12px 20px",
                     }}
                     fullWidth
                     onClick={() => setIsPopupOpen(Popup.SignUp)}
@@ -351,23 +424,26 @@ export default function AppAppBar() {
                 </MenuItem>
                 <MenuItem>
                   <Button
-                    variant="text"
+                    variant="contained"
                     sx={{
-                      textTransform: "capitalize",
-                      color: "#000000",
+                      background: "#000000",
+                      textTransform: "initial",
+                      color: "#ffffff",
                       fontWeight: 500,
                     }}
                     fullWidth
                     onClick={() => setIsPopupOpen(Popup.SignIn)}
                   >
-                    Sign in
+                    Log in
                   </Button>
                 </MenuItem>
               </Box>
             </Drawer>
           </Box>
         </StyledToolbar>
-      </Container>
-    </AppBar>
+      </AppBar>
+    </>
   );
-}
+};
+
+export default Header;

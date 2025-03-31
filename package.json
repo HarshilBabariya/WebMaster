@@ -13,17 +13,22 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.8",
+    "formik": "^2.4.6",
     "mysql2": "^3.14.0",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.4.0"
+    "react-router-dom": "^7.4.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-slick": "^0.23.13",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "typescript": "^5"
