@@ -4,11 +4,10 @@ import {
   Grid,
   Typography,
   Button,
-  Card,
-  CardContent,
-  Avatar,
   Box,
   Divider,
+  FormControl,
+  TextField,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
@@ -17,6 +16,11 @@ import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRound
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Image from "next/image";
+import CustomPopup from "@/components/CustomPopup";
+import { Field, Form, Formik } from "formik";
+import * as Yup from "yup";
+import { useRouter } from "next/navigation";
 
 interface IReview {
   id: number;
@@ -46,12 +50,21 @@ const settings = {
   customPaging: () => <Box sx={{ display: "none" }}></Box>,
 };
 
+const validationSchema = Yup.object({
+  name: Yup.string().required("* Name is required"),
+  email: Yup.string().email("Invalid email").required("* Email is required"),
+  reason: Yup.string().required("* Reason is required"),
+});
+
 const LandingPage = () => {
+  const router = useRouter();
   const [reviews, setReviews] = React.useState<IReview[]>([]);
+  const [isReady, setIsReady] = React.useState<boolean>(false);
 
   useEffect(() => {
     fetch("/api/reviews", {
       method: "GET",
+      cache: "no-cache",
     })
       .then((res) => res.json())
       .then((data) => {
@@ -64,8 +77,138 @@ const LandingPage = () => {
       });
   }, []);
 
+  const handleWorkRequests = (values: {
+    email: string;
+    name: string;
+    reason: string;
+  }) => {
+    fetch("/api/work_requests", {
+      body: JSON.stringify({
+        name: values.name,
+        email: values.email,
+        reason: values.reason,
+      }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const response: {
+          message: string;
+        } = data;
+        if (response.message) {
+          setIsReady(false);
+        }
+      });
+  };
+
   return (
     <>
+      <CustomPopup
+        sx={{
+          width: "350px",
+          minHeight: "100%",
+          padding: 4,
+        }}
+        open={isReady}
+        handleClose={() => setIsReady(false)}
+        actions
+      >
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{
+            width: "100%",
+            fontSize: "clamp(2rem, 10vw, 2.15rem)",
+            fontWeight: 600,
+            mb: 2,
+            textAlign: "center",
+          }}
+        >
+          Get in touch
+        </Typography>
+        <Formik
+          initialValues={{
+            email: "",
+            name: "",
+            reason: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => handleWorkRequests(values)}
+        >
+          {({ errors, touched }) => (
+            <Form
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 15,
+                width: "100%",
+              }}
+            >
+              <FormControl sx={{ width: "100%" }}>
+                <Field
+                  as={TextField}
+                  variant="outlined"
+                  name="name"
+                  placeholder="Name"
+                  error={touched.name && !!errors.name}
+                  helperText={touched.name && errors.name}
+                  fullWidth
+                />
+              </FormControl>
+              <FormControl sx={{ width: "100%" }}>
+                <Field
+                  as={TextField}
+                  variant="outlined"
+                  name="email"
+                  placeholder="Email"
+                  error={touched.email && !!errors.email}
+                  helperText={touched.email && errors.email}
+                  fullWidth
+                />
+              </FormControl>
+              <FormControl sx={{ width: "100%" }}>
+                <Field
+                  as={TextField}
+                  variant="outlined"
+                  name="reason"
+                  type="text"
+                  multiline
+                  minRows={3}
+                  placeholder="Why you want to join the community?"
+                  error={touched.reason && !!errors.reason}
+                  helperText={touched.reason && errors.reason}
+                  fullWidth
+                />
+              </FormControl>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                sx={{
+                  background: "#000",
+                  color: "#FFF",
+                  fontWeight: 500,
+                  textTransform: "initial",
+                }}
+              >
+                Submit
+              </Button>
+            </Form>
+          )}
+        </Formik>
+        <Box>
+          <Typography
+            sx={{
+              mt: 3,
+              fontSize: "14px",
+              color: "grey",
+            }}
+          >
+            Our team will response within 24 hours. Have a good day.
+          </Typography>
+        </Box>
+      </CustomPopup>
       <Grid container spacing={4} alignItems="center">
         <Grid item xs={12} md={7}>
           <Typography variant="h3" fontWeight={700} gutterBottom>
@@ -94,6 +237,7 @@ const LandingPage = () => {
                 fontWeight: 600,
                 fontSize: "13px",
               }}
+              onClick={() => setIsReady(true)}
             >
               Schedule Call <ArrowForwardRoundedIcon sx={{ width: 20 }} />
             </Button>
@@ -105,6 +249,7 @@ const LandingPage = () => {
                 fontSize: "12px",
                 textDecoration: "underline",
               }}
+              onClick={() => router.push("/case-study")}
             >
               View Case Study
             </Button>
@@ -307,11 +452,28 @@ const LandingPage = () => {
           flexDirection: "column",
           gap: 2,
           alignItems: "center",
+          marginBottom: "40px",
         }}
       >
-        <Typography style={{ fontSize: "40px" }}>
-          What our customer are saying
-        </Typography>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Image
+            src="/assets/star-icon.gif"
+            alt="Star"
+            style={{ filter: "invert(1)" }}
+            width={35}
+            height={35}
+          />
+          <Typography style={{ fontSize: "40px" }}>
+            What our customer are saying
+          </Typography>
+          <Image
+            src="/assets/star-icon.gif"
+            style={{ filter: "invert(1)" }}
+            alt="Star"
+            width={35}
+            height={35}
+          />
+        </Box>
         <Box sx={{ width: "100%" }}>
           <Slider {...settings}>
             {reviews.map((review) => (
@@ -354,7 +516,6 @@ const LandingPage = () => {
           </Slider>
         </Box>
       </Box>
-      <Divider sx={{ borderColor: "white", margin: "20px 0 50px 0" }} />
       <Box
         sx={{
           backgroundImage: `url("https://t3.ftcdn.net/jpg/03/12/22/06/360_F_312220617_RYUnWE2XLsPDReOosFB71ADPYOOR5e1N.jpg")`,
@@ -381,6 +542,7 @@ const LandingPage = () => {
             fontWeight: 600,
             fontSize: "13px",
           }}
+          onClick={() => setIsReady(true)}
         >
           Get Started <ArrowForwardRoundedIcon sx={{ width: 20 }} />
         </Button>

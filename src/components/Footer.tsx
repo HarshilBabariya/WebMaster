@@ -9,7 +9,7 @@ const footerLinks = [
   { label: "Support", route: "support" },
   { label: "Privacy", route: "privacy" },
   { label: "FAQs", route: "faqs" },
-  { label: "Contact", route: "contact-us" },
+  { label: "Contact Us", route: "contact-us" },
 ];
 
 export const Footer = () => {
@@ -20,6 +20,7 @@ export const Footer = () => {
         backgroundColor: "#000000",
         padding: "2rem 0",
         bottom: 0,
+        borderTop: "1px solid white",
       }}
     >
       <Container maxWidth="lg">
@@ -45,7 +46,9 @@ export const Footer = () => {
           >
             {footerLinks.map((footerItem, index) => (
               <Link key={index} href={footerItem.route}>
-                {footerItem.label}
+                <Typography sx={{ "&:hover": { color: "#AAAAAA" } }}>
+                  {footerItem.label}
+                </Typography>
               </Link>
             ))}
           </Grid>
@@ -53,28 +56,28 @@ export const Footer = () => {
             <IconButton
               href="https://facebook.com"
               target="_blank"
-              sx={{ color: "white" }}
+              sx={{ color: "white", "&:hover": { color: "#AAAAAA" } }}
             >
               <Facebook />
             </IconButton>
             <IconButton
               href="https://twitter.com"
               target="_blank"
-              sx={{ color: "white" }}
+              sx={{ color: "white", "&:hover": { color: "#AAAAAA" } }}
             >
               <Twitter />
             </IconButton>
             <IconButton
               href="https://instagram.com"
               target="_blank"
-              sx={{ color: "white" }}
+              sx={{ color: "white", "&:hover": { color: "#AAAAAA" } }}
             >
               <Instagram />
             </IconButton>
             <IconButton
               href="https://linkedin.com"
               target="_blank"
-              sx={{ color: "white" }}
+              sx={{ color: "white", "&:hover": { color: "#AAAAAA" } }}
             >
               <LinkedIn />
             </IconButton>
