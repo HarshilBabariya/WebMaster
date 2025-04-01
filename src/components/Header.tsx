@@ -121,7 +121,44 @@ const Header = () => {
           setError("Something went wrong");
         });
     } else {
-      // handle sign up
+      fetch("/api/users", {
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+        }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const response: {
+            error?: string;
+            user?: IUser;
+            message?: string;
+          } = data;
+          if (response.error) {
+            setError(response.error);
+            return;
+          }
+          if (response.message && response.user) {
+            localStorage.setItem(
+              "userData",
+              JSON.stringify({
+                id: response.user.id,
+                name: response.user.name,
+                email: response.user.email,
+                profile_url: response.user.profile_url,
+                role: response.user.role,
+                phone: response.user.phone,
+              })
+            );
+            setIsPopupOpen(null);
+          }
+        })
+        .catch((_error) => {
+          setError("Something went wrong");
+        });
     }
   };
 
@@ -133,7 +170,10 @@ const Header = () => {
     <>
       <CustomPopup
         open={isPopupOpen !== null}
-        handleClose={() => setIsPopupOpen(null)}
+        handleClose={() => {
+          setIsPopupOpen(null);
+          setError("");
+        }}
         actions
       >
         <SignInContainer>
@@ -162,7 +202,7 @@ const Header = () => {
               email: "",
               password: "",
               name: "",
-              isSignUp: isPopupOpen
+              isSignUp: isPopupOpen,
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => handleSubmit(values)}
