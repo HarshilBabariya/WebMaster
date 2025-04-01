@@ -44,13 +44,7 @@ const StyledToolbar = styled(Toolbar)(() => ({
   padding: "20px 16px",
 }));
 
-const SignInContainer = styled(Stack)(({ theme }) => ({
-  width: "350px",
-  minHeight: "100%",
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
-}));
+const SignInContainer = styled(Stack)(({ theme }) => ({}));
 
 const headerButtons = [
   { label: "Dashboard", route: "/dashboard" },
@@ -170,129 +164,134 @@ const Header = () => {
     <>
       <CustomPopup
         open={isPopupOpen !== null}
+        sx={{
+          width: "350px",
+          minHeight: "100%",
+          padding: 4,
+        }}
         handleClose={() => {
           setIsPopupOpen(null);
           setError("");
         }}
         actions
       >
-        <SignInContainer>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Image
             src={"/assets/webmaster-gif.gif"}
             alt="WebMaster"
             width={100}
             height={100}
-            style={{ borderRadius: "8px", alignSelf: "center" }}
+            style={{ borderRadius: "8px" }}
           />
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{
-              width: "100%",
-              fontSize: "clamp(2rem, 10vw, 2.15rem)",
-              fontWeight: 600,
-              mb: 2,
-              textAlign: "center",
-            }}
-          >
-            {isPopupOpen === Popup.SignIn ? "Hello there!" : "Welcome!"}
-          </Typography>
-          <Formik
-            initialValues={{
-              email: "",
-              password: "",
-              name: "",
-              isSignUp: isPopupOpen,
-            }}
-            validationSchema={validationSchema}
-            onSubmit={(values) => handleSubmit(values)}
-          >
-            {({ errors, touched }) => (
-              <Form
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 15,
-                  width: "100%",
-                }}
-              >
-                {isPopupOpen === Popup.SignUp && (
-                  <FormControl sx={{ width: "100%" }}>
-                    <Field
-                      as={TextField}
-                      variant="standard"
-                      name="name"
-                      placeholder="Name"
-                      error={touched.name && !!errors.name}
-                      helperText={touched.name && errors.name}
-                      fullWidth
-                    />
-                  </FormControl>
-                )}
+        </Box>
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{
+            width: "100%",
+            fontSize: "clamp(2rem, 10vw, 2.15rem)",
+            fontWeight: 600,
+            mb: 2,
+            textAlign: "center",
+          }}
+        >
+          {isPopupOpen === Popup.SignIn ? "Hello there!" : "Welcome!"}
+        </Typography>
+        <Formik
+          initialValues={{
+            email: "",
+            password: "",
+            name: "",
+            isSignUp: isPopupOpen,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => handleSubmit(values)}
+        >
+          {({ errors, touched }) => (
+            <Form
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 15,
+                width: "100%",
+              }}
+            >
+              {isPopupOpen === Popup.SignUp && (
                 <FormControl sx={{ width: "100%" }}>
                   <Field
                     as={TextField}
                     variant="standard"
-                    name="email"
-                    placeholder="Email"
-                    error={touched.email && !!errors.email}
-                    helperText={touched.email && errors.email}
+                    name="name"
+                    placeholder="Name"
+                    error={touched.name && !!errors.name}
+                    helperText={touched.name && errors.name}
                     fullWidth
                   />
                 </FormControl>
-                <FormControl sx={{ width: "100%" }}>
-                  <Field
-                    as={TextField}
-                    variant="standard"
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    error={touched.password && !!errors.password}
-                    helperText={touched.password && errors.password}
-                    fullWidth
-                  />
-                </FormControl>
-                <Button
-                  type="submit"
-                  variant="contained"
+              )}
+              <FormControl sx={{ width: "100%" }}>
+                <Field
+                  as={TextField}
+                  variant="standard"
+                  name="email"
+                  placeholder="Email"
+                  error={touched.email && !!errors.email}
+                  helperText={touched.email && errors.email}
                   fullWidth
-                  sx={{ background: "#000", color: "#FFF", fontWeight: 500 }}
-                >
-                  {isPopupOpen === Popup.SignIn ? "Login" : "Register"}
-                </Button>
-                {error.length > 0 && <Alert severity="error">{error}</Alert>}
-              </Form>
-            )}
-          </Formik>
-          <Box>
-            <Typography
-              sx={{
-                mt: 3,
-                fontSize: "18px",
-                fontWeight: 600,
-              }}
-            >
-              {isPopupOpen === Popup.SignIn
-                ? "New to Webmaster?"
-                : "Already have account?"}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "16px",
-                fontWeight: 600,
-                color: "red",
-                cursor: "pointer",
-              }}
-              onClick={() =>
-                setIsPopupOpen(
-                  isPopupOpen === Popup.SignIn ? Popup.SignUp : Popup.SignIn
-                )
-              }
-            >
-              {isPopupOpen === Popup.SignIn ? "JOIN NOW" : "LOG IN"}
-            </Typography>
-          </Box>
-        </SignInContainer>
+                />
+              </FormControl>
+              <FormControl sx={{ width: "100%" }}>
+                <Field
+                  as={TextField}
+                  variant="standard"
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  error={touched.password && !!errors.password}
+                  helperText={touched.password && errors.password}
+                  fullWidth
+                />
+              </FormControl>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                sx={{ background: "#000", color: "#FFF", fontWeight: 500 }}
+              >
+                {isPopupOpen === Popup.SignIn ? "Login" : "Register"}
+              </Button>
+              {error.length > 0 && <Alert severity="error">{error}</Alert>}
+            </Form>
+          )}
+        </Formik>
+        <Box>
+          <Typography
+            sx={{
+              mt: 3,
+              fontSize: "18px",
+              fontWeight: 600,
+            }}
+          >
+            {isPopupOpen === Popup.SignIn
+              ? "New to Webmaster?"
+              : "Already have account?"}
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "16px",
+              fontWeight: 600,
+              color: "red",
+              cursor: "pointer",
+            }}
+            onClick={() =>
+              setIsPopupOpen(
+                isPopupOpen === Popup.SignIn ? Popup.SignUp : Popup.SignIn
+              )
+            }
+          >
+            {isPopupOpen === Popup.SignIn ? "JOIN NOW" : "LOG IN"}
+          </Typography>
+        </Box>
       </CustomPopup>
       <AppBar
         position="fixed"
