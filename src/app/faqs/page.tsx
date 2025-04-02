@@ -53,16 +53,11 @@ const FAQs = () => {
         </Typography>
         <Box display="flex" gap={5} mt={4}>
           <Button
-            variant="outlined"
+            variant="contained"
             sx={{
               width: "180px",
-              color: "white",
-              textTransform: "initial",
               padding: "10px 20px",
-              borderRadius: "20px",
-              fontWeight: 600,
               fontSize: "13px",
-              borderColor: "white",
             }}
             onClick={() => setMoreQuestionClicked(true)}
           >
@@ -70,9 +65,6 @@ const FAQs = () => {
           </Button>
           <Button
             sx={{
-              color: "white",
-              textTransform: "initial",
-              fontWeight: 600,
               fontSize: "12px",
               textDecoration: "underline",
             }}
@@ -83,42 +75,44 @@ const FAQs = () => {
         </Box>
       </Grid>
       <Grid item md={7} lg={7} sm={12} xs={12}>
-        {faqData.slice(0, moreQuestionClicked ? undefined : 3).map((faq, index) => (
-          <Accordion
-            key={index}
-            sx={{
-              backgroundColor: "black",
-              borderBottom: "1px solid white",
-              borderRadius: 0,
-            }}
-          >
-            <AccordionSummary
-              expandIcon={
-                <span className="icon">
-                  <AddRoundedIcon
-                    sx={{ color: "white" }}
-                    className="icon-plus"
-                  />
-                  <RemoveRoundedIcon
-                    sx={{ color: "white", display: "none" }}
-                    className="icon-minus"
-                  />
-                </span>
-              }
+        {faqData
+          .slice(0, moreQuestionClicked ? undefined : 3)
+          .map((faq, index) => (
+            <Accordion
+              key={index}
               sx={{
-                "& .Mui-expanded .icon-plus": { display: "none" },
-                "& .Mui-expanded .icon-minus": { display: "block" },
+                backgroundColor: "black",
+                borderBottom: "1px solid white",
+                borderRadius: 0,
               }}
             >
-              <Typography sx={{ color: "white", fontSize: "18px" }}>
-                {faq.question}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography sx={{ color: "#AAAAAA" }}>{faq.answer}</Typography>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+              <AccordionSummary
+                expandIcon={
+                  <span className="icon">
+                    <AddRoundedIcon
+                      sx={{ color: "white" }}
+                      className="icon-plus"
+                    />
+                    <RemoveRoundedIcon
+                      sx={{ color: "white", display: "none" }}
+                      className="icon-minus"
+                    />
+                  </span>
+                }
+                sx={{
+                  "& .Mui-expanded .icon-plus": { display: "none" },
+                  "& .Mui-expanded .icon-minus": { display: "block" },
+                }}
+              >
+                <Typography sx={{ color: "white", fontSize: "18px" }}>
+                  {faq.question}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography sx={{ color: "#AAAAAA" }}>{faq.answer}</Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
       </Grid>
     </Grid>
   );

@@ -8,7 +8,6 @@ import {
   Toolbar,
   Button,
   IconButton,
-  Container,
   Divider,
   MenuItem,
   Drawer,
@@ -17,7 +16,6 @@ import {
   FormControl,
   TextField,
   Alert,
-  Menu,
 } from "@mui/material";
 import CustomPopup from "./CustomPopup";
 import Image from "next/image";
@@ -185,12 +183,9 @@ const Header = () => {
           />
         </Box>
         <Typography
-          component="h1"
           variant="h4"
           sx={{
             width: "100%",
-            fontSize: "clamp(2rem, 10vw, 2.15rem)",
-            fontWeight: 600,
             mb: 2,
             textAlign: "center",
           }}
@@ -256,7 +251,7 @@ const Header = () => {
                 type="submit"
                 variant="contained"
                 fullWidth
-                sx={{ background: "#000", color: "#FFF", fontWeight: 500 }}
+                sx={{ background: "#000", color: "#FFF", borderRadius: "4px" }}
               >
                 {isPopupOpen === Popup.SignIn ? "Login" : "Register"}
               </Button>
@@ -277,8 +272,8 @@ const Header = () => {
               : "Already have account?"}
           </Typography>
           <Typography
+            variant="body1"
             sx={{
-              fontSize: "16px",
               fontWeight: 600,
               color: "red",
               cursor: "pointer",
@@ -319,14 +314,6 @@ const Header = () => {
                   <Button
                     key={button.route}
                     variant="text"
-                    sx={{
-                      textTransform: "capitalize",
-                      color: "#ffffff",
-                      fontWeight: 500,
-                      "&:hover": {
-                        color: "#AAAAAA",
-                      },
-                    }}
                     onClick={() => router.push(button.route)}
                   >
                     {button.label}
@@ -377,13 +364,7 @@ const Header = () => {
               <Button
                 variant="text"
                 sx={{
-                  textTransform: "initial",
-                  color: "#ffffff",
-                  fontWeight: 500,
                   padding: "12px 20px",
-                  "&:hover": {
-                    color: "#AAAAAA",
-                  },
                 }}
                 onClick={() => setIsPopupOpen(Popup.SignUp)}
               >
@@ -392,10 +373,6 @@ const Header = () => {
               <Button
                 variant="contained"
                 sx={{
-                  background: "#ffffff",
-                  textTransform: "initial",
-                  color: "#000000",
-                  fontWeight: 500,
                   borderRadius: "30px",
                   padding: "12px 20px",
                 }}
@@ -435,7 +412,6 @@ const Header = () => {
                     <MenuItem
                       key={button.route}
                       sx={{
-                        textTransform: "capitalize",
                         color: "#000000",
                         fontWeight: 500,
                       }}
@@ -450,9 +426,6 @@ const Header = () => {
                   <Button
                     variant="text"
                     sx={{
-                      textTransform: "initial",
-                      color: "#000000",
-                      fontWeight: 500,
                       padding: "12px 20px",
                     }}
                     fullWidth
@@ -466,9 +439,7 @@ const Header = () => {
                     variant="contained"
                     sx={{
                       background: "#000000",
-                      textTransform: "initial",
                       color: "#ffffff",
-                      fontWeight: 500,
                     }}
                     fullWidth
                     onClick={() => setIsPopupOpen(Popup.SignIn)}

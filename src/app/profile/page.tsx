@@ -168,7 +168,6 @@ const ProfilePage = () => {
                 borderRadius: "16px",
                 width: "max-content",
                 padding: "8px 16px",
-                textTransform: "capitalize",
                 color: "black",
               }}
             >
@@ -230,7 +229,6 @@ const ProfilePage = () => {
                 borderRadius: "16px",
                 width: "max-content",
                 padding: "8px 16px",
-                textTransform: "capitalize",
                 color: "black",
               }}
             >

@@ -115,12 +115,9 @@ const LandingPage = () => {
         actions
       >
         <Typography
-          component="h1"
-          variant="h4"
+          variant="h3"
           sx={{
             width: "100%",
-            fontSize: "clamp(2rem, 10vw, 2.15rem)",
-            fontWeight: 600,
             mb: 2,
             textAlign: "center",
           }}
@@ -188,8 +185,7 @@ const LandingPage = () => {
                 sx={{
                   background: "#000",
                   color: "#FFF",
-                  fontWeight: 500,
-                  textTransform: "initial",
+                  borderRadius: "4px",
                 }}
               >
                 Submit
@@ -197,26 +193,17 @@ const LandingPage = () => {
             </Form>
           )}
         </Formik>
-        <Box>
-          <Typography
-            sx={{
-              mt: 3,
-              fontSize: "14px",
-              color: "grey",
-            }}
-          >
-            Our team will response within 24 hours. Have a good day.
-          </Typography>
-        </Box>
+        <Typography variant="caption">
+          Our team will response within 24 hours. Have a good day.
+        </Typography>
       </CustomPopup>
       <Grid container spacing={4} alignItems="center">
         <Grid item xs={12} md={7}>
-          <Typography variant="h3" fontWeight={700} gutterBottom>
+          <Typography variant="h2" gutterBottom>
             Stay ahead of trends with our progressive strategies.
           </Typography>
           <Typography
             variant="body1"
-            paragraph
             sx={{ color: "#AAAAAA", width: "90%" }}
           >
             An award-winning web builder with disciplines in E-commerce, design,
@@ -224,17 +211,13 @@ const LandingPage = () => {
           </Typography>
           <Box display="flex" gap={5} mt={4}>
             <Button
+              variant="contained"
               sx={{
                 width: "180px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                backgroundColor: "white",
-                color: "black",
-                textTransform: "initial",
                 padding: "10px 20px",
-                borderRadius: "20px",
-                fontWeight: 600,
                 fontSize: "13px",
               }}
               onClick={() => setIsReady(true)}
@@ -243,9 +226,6 @@ const LandingPage = () => {
             </Button>
             <Button
               sx={{
-                color: "white",
-                textTransform: "initial",
-                fontWeight: 600,
                 fontSize: "12px",
                 textDecoration: "underline",
               }}
@@ -302,10 +282,10 @@ const LandingPage = () => {
               right: 75,
             }}
           >
-            <Typography sx={{ fontSize: "60px", fontWeight: 600 }}>
+            <Typography variant="h1">
               230+
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1">
               some websites that we build, and successfully running.
             </Typography>
           </Box>
@@ -384,12 +364,11 @@ const LandingPage = () => {
             justifyContent: "space-between",
           }}
         >
-          <Typography variant="h3" fontWeight={700} gutterBottom>
+          <Typography variant="h2" gutterBottom>
             Provide the best service with our out of the box ideas
           </Typography>
           <Typography
             variant="body1"
-            paragraph
             sx={{ color: "#AAAAAA", width: "80%" }}
           >
             we are passionate team which have experienced with more than enough
@@ -414,10 +393,10 @@ const LandingPage = () => {
                 color: "white",
               }}
             >
-              <Typography sx={{ fontSize: "60px", fontWeight: 600 }}>
+              <Typography variant="h1">
                 100<span style={{ color: "green" }}>+</span>
               </Typography>
-              <Typography variant="body1" paragraph sx={{ color: "#AAAAAA" }}>
+              <Typography variant="body1" sx={{ color: "#AAAAAA" }}>
                 projects finish with superbly
               </Typography>
             </Box>
@@ -437,7 +416,7 @@ const LandingPage = () => {
                 color: "white",
               }}
             >
-              <Typography sx={{ fontSize: "60px" }}>
+              <Typography variant="h1">
                 HOW WE <span style={{ color: "green" }}>WORK</span>
               </Typography>
             </Box>
@@ -495,7 +474,6 @@ const LandingPage = () => {
                   variant="body1"
                   sx={{
                     marginTop: 2,
-                    fontSize: "16px",
                     fontStyle: "italic",
                     color: "#AAAAAA",
                   }}
@@ -506,7 +484,6 @@ const LandingPage = () => {
                   variant="body1"
                   sx={{
                     marginTop: 2,
-                    fontSize: "16px",
                   }}
                 >
                   - {review.name}
@@ -525,21 +502,17 @@ const LandingPage = () => {
           alignItems: "center",
         }}
       >
-        <Typography sx={{ fontSize: "60px", fontWeight: 700 }}>
+        <Typography variant="h1">
           Ready to work with us?
         </Typography>
         <Button
+          variant="contained"
           sx={{
             width: "180px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor: "white",
-            color: "black",
-            textTransform: "initial",
             padding: "10px 20px",
-            borderRadius: "20px",
-            fontWeight: 600,
             fontSize: "13px",
           }}
           onClick={() => setIsReady(true)}
