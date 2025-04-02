@@ -6,7 +6,6 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemText,
   IconButton,
 } from "@mui/material";
 import { Facebook, Twitter, LinkedIn } from "@mui/icons-material";

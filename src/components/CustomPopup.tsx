@@ -7,14 +7,12 @@ export default function CustomPopup({
   open,
   handleClose,
   children,
-  actions,
   sx,
 }: {
   open: boolean;
   handleClose: () => void;
   children: React.ReactNode;
-  actions: React.ReactNode;
-  sx: any;
+  sx?: any;
 }) {
   return (
     <Dialog open={open}>
@@ -28,7 +26,6 @@ export default function CustomPopup({
         onClick={handleClose}
       />
       <DialogContent sx={sx}>{children}</DialogContent>
-      <DialogActions>{actions}</DialogActions>
     </Dialog>
   );
 }

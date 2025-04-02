@@ -1,17 +1,16 @@
-import { Chip, TableCell } from "@mui/material";
-import React, { useState } from "react";
+import { Chip } from "@mui/material";
 
-const StatusChip = ({ initialStatus }: { initialStatus: string }) => {
-  const [status, setStatus] = useState(initialStatus);
-
-  const toggleStatus = () => {
-    setStatus((prev) => (prev === "Active" ? "Inactive" : "Active"));
-  };
-
+const StatusChip = ({
+  status,
+  onToggle,
+}: {
+  status: string;
+  onToggle: () => void;
+}) => {
   return (
     <Chip
       label={status}
-      onClick={toggleStatus}
+      onClick={onToggle}
       sx={{
         cursor: "pointer",
         backgroundColor: status === "Active" ? "#aee2ae" : "#efc4c4",

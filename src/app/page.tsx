@@ -112,7 +112,6 @@ const LandingPage = () => {
         }}
         open={isReady}
         handleClose={() => setIsReady(false)}
-        actions
       >
         <Typography
           variant="h3"
@@ -140,6 +139,7 @@ const LandingPage = () => {
                 flexDirection: "column",
                 gap: 15,
                 width: "100%",
+                marginBottom: "20px",
               }}
             >
               <FormControl sx={{ width: "100%" }}>
@@ -172,6 +172,7 @@ const LandingPage = () => {
                   type="text"
                   multiline
                   minRows={3}
+                  maxRows={3}
                   placeholder="Why you want to join the community?"
                   error={touched.reason && !!errors.reason}
                   helperText={touched.reason && errors.reason}
@@ -202,10 +203,7 @@ const LandingPage = () => {
           <Typography variant="h2" gutterBottom>
             Stay ahead of trends with our progressive strategies.
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{ color: "#AAAAAA", width: "90%" }}
-          >
+          <Typography variant="body1" sx={{ color: "#AAAAAA", width: "90%" }}>
             An award-winning web builder with disciplines in E-commerce, design,
             and website development. focused on understanding you.
           </Typography>
@@ -282,9 +280,7 @@ const LandingPage = () => {
               right: 75,
             }}
           >
-            <Typography variant="h1">
-              230+
-            </Typography>
+            <Typography variant="h1">230+</Typography>
             <Typography variant="body1">
               some websites that we build, and successfully running.
             </Typography>
@@ -367,10 +363,7 @@ const LandingPage = () => {
           <Typography variant="h2" gutterBottom>
             Provide the best service with our out of the box ideas
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{ color: "#AAAAAA", width: "80%" }}
-          >
+          <Typography variant="body1" sx={{ color: "#AAAAAA", width: "80%" }}>
             we are passionate team which have experienced with more than enough
             e-commerce website development. With deep understanding of
             ever-evolving e-commerce landscape, we can help you to create a
@@ -502,9 +495,7 @@ const LandingPage = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h1">
-          Ready to work with us?
-        </Typography>
+        <Typography variant="h1">Ready to work with us?</Typography>
         <Button
           variant="contained"
           sx={{

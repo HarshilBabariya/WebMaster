@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -11,7 +11,6 @@ import {
   Divider,
   MenuItem,
   Drawer,
-  Stack,
   Typography,
   FormControl,
   TextField,
@@ -42,8 +41,6 @@ const StyledToolbar = styled(Toolbar)(() => ({
   padding: "20px 16px",
 }));
 
-const SignInContainer = styled(Stack)(({ theme }) => ({}));
-
 const headerButtons = [
   { label: "Dashboard", route: "/dashboard" },
   { label: "Products", route: "/products" },
@@ -67,7 +64,11 @@ const Header = () => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = React.useState<Popup | null>(null);
   const [error, setError] = React.useState("");
-  const userDetails = JSON.parse(localStorage.getItem("userData") || "{}");
+  const userDetails = JSON.parse(
+    typeof window !== "undefined"
+      ? localStorage.getItem("userData") || "{}"
+      : "{}"
+  );
 
   const handleSubmit = (values: {
     email: string;
@@ -171,7 +172,6 @@ const Header = () => {
           setIsPopupOpen(null);
           setError("");
         }}
-        actions
       >
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Image
