@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     if (result.affectedRows > 0) {
       return NextResponse.json({
         message: "User registered successfully",
-        userId: result.insertId,
+        user_id: result.insertId,
       });
     }
     return NextResponse.json(

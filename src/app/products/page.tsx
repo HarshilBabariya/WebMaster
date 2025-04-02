@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -13,50 +14,63 @@ import {
   TableRow,
   TableSortLabel,
   TablePagination,
-  Chip,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import GetAppRoundedIcon from "@mui/icons-material/GetAppRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
-import { useRouter } from "next/navigation";
 import StatusChip from "@/components/StatusChip";
+import CustomPopup from "@/components/CustomPopup";
 
-const sampleProducts = Array.from({ length: 50 }, (_, index) => ({
-  id: index + 1,
-  image: `https://picsum.photos/200/300?random=${index + 1}`,
-  name: `Product ${index + 1}`,
-  description: `This is a description This is a descriptionThis is a descriptionThis is a descriptionThis is a descriptionThis is a descriptionThis is a descriptionThis is a descriptionThis is a description of product ${
-    index + 1
-  }`,
-  brand: `Brand ${(index % 5) + 1}`,
-  category: `Category ${(index % 5) + 1}`,
-  price: (Math.random() * 100).toFixed(2),
-  stock: Math.floor(Math.random() * 100),
-  tax: (Math.random() * 10).toFixed(2),
-  status: index % 2 === 0 ? "Active" : "Inactive",
-}));
+export enum MsgType {
+  Error,
+  Success,
+}
+
+export interface IToastMsg {
+  msg: string;
+  type: MsgType;
+}
+
+export interface IProduct {
+  product_id: number;
+  name: string;
+  price: number;
+  description: string;
+  status: string;
+  discount: number;
+  images: string[];
+  brand: string;
+  category: string | null;
+  stock: number;
+  weight: number;
+  width: number;
+  height: number;
+  sku: string | null;
+}
 
 export default function Products() {
   const rowsPerPage = 10;
   const router = useRouter();
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] =
-    useState<keyof (typeof sampleProducts)[0]>("name");
+  const [orderBy, setOrderBy] = useState<keyof IProduct>("name");
   const [page, setPage] = useState(0);
-  const [status, setStatus] = useState("");
+  const [deleteId, setDeleteId] = useState(-1);
+  const [toastMsg, setToastMsg] = useState<IToastMsg>({
+    msg: "",
+    type: MsgType.Error,
+  });
 
-  const toggleStatus = () => {
-    setStatus((prev) => (prev === "Active" ? "Inactive" : "Active"));
-  };
-
-  const handleSort = (property: keyof (typeof sampleProducts)[0]) => {
+  const handleSort = (property: keyof IProduct) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  const sortedData = [...sampleProducts].sort((a, b) => {
+  const sortedData = products.sort((a: any, b: any) => {
     if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
     if (a[orderBy] > b[orderBy]) return order === "asc" ? 1 : -1;
     return 0;
@@ -67,8 +81,116 @@ export default function Products() {
     page * rowsPerPage + rowsPerPage
   );
 
+  const fetchProducts = () => {
+    fetch("/api/products", {
+      method: "GET",
+      cache: "no-cache",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const response: {
+          products?: IProduct[];
+        } = data;
+        if (response.products) {
+          setProducts(response.products);
+        }
+      });
+  };
+
+  const toggleStatus = (id: number, status: string) => {
+    fetch(`/api/products/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: status === "Active" ? "Inactive" : "Active",
+        key: "status",
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message) {
+          setToastMsg({ msg: data.message, type: MsgType.Success });
+          fetchProducts();
+        } else {
+          setToastMsg({ msg: data.error, type: MsgType.Error });
+        }
+      });
+  };
+
+  const deleteProduct = () => {
+    fetch(`/api/products/${deleteId}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const response: {
+          message?: string;
+          error?: string;
+        } = data;
+        if (response.message) {
+          setToastMsg({ msg: response.message, type: MsgType.Success });
+          setDeleteId(-1);
+        } else if (response.error) {
+          setToastMsg({ msg: response.error, type: MsgType.Error });
+        }
+      });
+  };
+
+  useEffect(() => fetchProducts(), []);
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        open={toastMsg.msg.length > 0}
+        autoHideDuration={2000}
+        onClose={() => setToastMsg({ msg: "", type: MsgType.Error })}
+      >
+        <Alert severity={toastMsg.type === MsgType.Error ? "error" : "success"}>
+          {toastMsg.msg}
+        </Alert>
+      </Snackbar>
+      <CustomPopup
+        open={deleteId > 0}
+        handleClose={() => setDeleteId(-1)}
+        sx={{
+          width: "350px",
+          minHeight: "100%",
+          padding: 4,
+        }}
+      >
+        <Typography>Are you sure you want to delete this product?</Typography>
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "end",
+            gap: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            sx={{ color: "black", borderColor: "black" }}
+            onClick={() => setDeleteId(-1)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              color: "white",
+              backgroundColor: "black",
+              borderRadius: "8px",
+            }}
+            onClick={deleteProduct}
+          >
+            Delete
+          </Button>
+        </Box>
+      </CustomPopup>
       <Box
         sx={{
           display: "flex",
@@ -76,7 +198,7 @@ export default function Products() {
           alignItems: "center",
         }}
       >
-        <Typography variant="h3">Products List</Typography>
+        <Typography variant="h5">Products List</Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Button sx={{ textDecoration: "underline" }}>Export CSV</Button>
           <Button
@@ -88,6 +210,7 @@ export default function Products() {
           <Button
             variant="contained"
             sx={{ display: "flex", alignItems: "center", borderRadius: "8px" }}
+            onClick={() => router.push("/products/new")}
           >
             <AddRoundedIcon /> Add Product
           </Button>
@@ -99,11 +222,13 @@ export default function Products() {
         sx={{ width: "100%", margin: "20px 0" }}
         placeholder="Search here..."
         InputProps={{
-          endAdornment: <SearchRoundedIcon sx={{ color: "grey" }} />,
+          endAdornment: (
+            <SearchRoundedIcon sx={{ color: "grey", marginRight: "10px" }} />
+          ),
         }}
       />
 
-      <TableContainer sx={{ border: "1px solid white", borderRadius: "8px" }}>
+      <TableContainer sx={{ border: "1px solid white", borderRadius: "4px" }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -154,11 +279,11 @@ export default function Products() {
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === "tax"}
+                  active={orderBy === "discount"}
                   direction={order}
-                  onClick={() => handleSort("tax")}
+                  onClick={() => handleSort("discount")}
                 >
-                  Tax
+                  Discount
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -192,67 +317,89 @@ export default function Products() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedData.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell
-                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                >
-                  <img
-                    src={product.image}
-                    width={50}
-                    height={50}
-                    style={{ borderRadius: "8px" }}
-                  />
-                  <span
-                    style={{
-                      cursor: "pointer",
-                      color: "#7cafbf",
-                      fontWeight: 600,
-                    }}
-                    onClick={() => router.push(`/products/${product.id}`)}
+            {products?.length > 0 ? (
+              paginatedData.map((product) => (
+                <TableRow key={product.product_id}>
+                  <TableCell
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    {product.name}
-                  </span>
-                </TableCell>
-                <TableCell
-                  sx={{
-                    maxWidth: "300px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {product.description.length > 100
-                    ? `${product.description.slice(0, 100)}...`
-                    : product.description}
-                </TableCell>
+                    <img
+                      src={product.images?.[0]}
+                      width={50}
+                      height={50}
+                      style={{
+                        borderRadius: "8px",
+                        objectFit: "cover",
+                        objectPosition: "top",
+                      }}
+                    />
+                    <span
+                      style={{
+                        cursor: "pointer",
+                        color: "#7cafbf",
+                        fontWeight: 600,
+                      }}
+                      onClick={() =>
+                        router.push(`/products/${product.product_id}`)
+                      }
+                    >
+                      {product.name}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      maxWidth: "300px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {product.description?.length > 100
+                      ? `${product.description.slice(0, 100)}...`
+                      : product.description}
+                  </TableCell>
 
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.price}</TableCell>
-                <TableCell>{product.tax}%</TableCell>
-                <TableCell>
-                  <StatusChip initialStatus={product.status} />
-                </TableCell>
-                <TableCell>{product.stock}</TableCell>
-                <TableCell align="center">
-                  <DeleteOutlineRoundedIcon
-                    sx={{ color: "red", cursor: "pointer" }}
-                  />
+                  <TableCell>{product.brand}</TableCell>
+                  <TableCell>{product.category}</TableCell>
+                  <TableCell>{product.price}</TableCell>
+                  <TableCell>{product.discount}%</TableCell>
+                  <TableCell>
+                    <StatusChip
+                      status={product.status}
+                      onToggle={() =>
+                        toggleStatus(product.product_id, product.status)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>{product.stock}</TableCell>
+                  <TableCell align="center">
+                    <DeleteOutlineRoundedIcon
+                      sx={{ color: "red", cursor: "pointer" }}
+                      onClick={() => setDeleteId(product.product_id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={9} sx={{ textAlign: "center" }}>
+                  No Products Found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-        <TablePagination
-          component={Box}
-          sx={{ color: "white" }}
-          count={sampleProducts.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPageOptions={[10]}
-        />
+        {products?.length ? (
+          <TablePagination
+            component={Box}
+            sx={{ color: "white" }}
+            count={products.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(_, newPage) => setPage(newPage)}
+            rowsPerPageOptions={[10]}
+          />
+        ) : null}
       </TableContainer>
     </>
   );

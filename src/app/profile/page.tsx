@@ -6,11 +6,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  Avatar,
   Button,
-  TextField,
   Container,
-  Grid,
 } from "@mui/material";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
